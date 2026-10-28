@@ -1,0 +1,571 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calculadora Retrô - AR Informática</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fontes Google para Display LCD e Tipografia Vintage -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Orbitron:wght@600;800;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Estilos e Variáveis Customizadas Retrô */
+        :root {
+            --bg-case: #d8cebe;
+            --bg-case-dark: #b8ac98;
+            --lcd-bg: #8ea98a;
+            --lcd-text: #132413;
+            --key-beige: #e5ded2;
+            --key-grey: #4b5563;
+            --key-orange: #d9622b;
+            --key-red: #b93c3c;
+            --key-yellow: #d9a029;
+            --key-dark: #2d3748;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #14151a;
+            background-image: 
+                radial-gradient(circle at 50% 30%, #252836 0%, #0c0d12 100%);
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .brand-font {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .lcd-font {
+            font-family: 'VT323', monospace;
+        }
+
+        .label-font {
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Textura do Corpo de Plástico e Placa Metálica Injetada */
+        .case-texture {
+            background-color: var(--bg-case);
+            background-image: radial-gradient(rgba(0,0,0,0.06) 1px, transparent 0);
+            background-size: 4px 4px;
+            box-shadow: 
+                inset 2px 2px 4px rgba(255, 255, 255, 0.8),
+                inset -3px -3px 6px rgba(0, 0, 0, 0.35),
+                0 25px 40px -5px rgba(0, 0, 0, 0.7),
+                0 10px 15px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .metallic-badge {
+            background: linear-gradient(135deg, #e6ded0 0%, #b8ac98 50%, #8f8270 100%);
+            box-shadow: 
+                inset 1px 1px 2px rgba(255,255,255,0.9),
+                inset -1px -1px 2px rgba(0,0,0,0.4),
+                0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid #786d5d;
+        }
+
+        /* Efeito de Vidro e Moldura Retrô no Display LCD */
+        .lcd-container {
+            background: #151d14;
+            box-shadow: 
+                inset 3px 3px 6px rgba(0, 0, 0, 0.85),
+                inset -2px -2px 4px rgba(255, 255, 255, 0.15),
+                0 2px 5px rgba(0,0,0,0.4);
+        }
+
+        .lcd-screen {
+            background-color: var(--lcd-bg);
+            box-shadow: inset 0 0 18px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        /* Linhas de scanline estilo LCD vintage */
+        .lcd-screen::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.08) 50%);
+            background-size: 100% 4px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .glass-glare {
+            background: linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.05) 45%, transparent 45%);
+        }
+
+        /* Botões 3D Táteis Vintage */
+        .btn-retro {
+            position: relative;
+            transition: all 0.05s ease;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 5px 0 var(--btn-shadow),
+                0 6px 6px rgba(0, 0, 0, 0.35),
+                inset 0 2px 2px rgba(255, 255, 255, 0.45);
+        }
+
+        .btn-retro:active, .btn-retro.active {
+            transform: translateY(4px);
+            box-shadow: 
+                0 1px 0 var(--btn-shadow),
+                0 2px 3px rgba(0, 0, 0, 0.3),
+                inset 0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Cores Temáticas de Botões Clássicos */
+        .btn-beige {
+            background-color: var(--key-beige);
+            color: #232323;
+            --btn-shadow: #a89d8d;
+        }
+
+        .btn-orange {
+            background-color: var(--key-orange);
+            color: #ffffff;
+            --btn-shadow: #8f3d14;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+        }
+
+        .btn-red {
+            background-color: var(--key-red);
+            color: #ffffff;
+            --btn-shadow: #7a2222;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+        }
+
+        .btn-yellow {
+            background-color: var(--key-yellow);
+            color: #1e1e1e;
+            --btn-shadow: #966c14;
+        }
+
+        .btn-dark {
+            background-color: var(--key-dark);
+            color: #e2e8f0;
+            --btn-shadow: #1a202c;
+        }
+
+        /* Bobina de Impressora de Papel do Histórico */
+        .paper-tape {
+            background: #fdfbf7;
+            background-image: repeating-linear-gradient(#fdfbf7, #fdfbf7 24px, #e8e3d5 25px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+        }
+
+        .drawer-slide {
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .led-indicator.on {
+            background-color: #22c55e;
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.9);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-3 sm:p-6 overflow-x-hidden">
+
+    <!-- Container Principal da Calculadora -->
+    <div class="relative w-full max-w-sm flex flex-col items-center">
+
+        <!-- Bobina de Papel do Histórico (Painel Deslizante Estilo Tape Printer Retrô) -->
+        <div id="historyDrawer" class="drawer-slide absolute top-0 left-0 right-0 z-10 -translate-y-full opacity-0 pointer-events-none transition-all duration-300 ease-out px-4 pt-2">
+            <div class="paper-tape text-stone-800 border-x-2 border-b-2 border-stone-400 rounded-b-xl p-4 relative overflow-hidden font-mono">
+                <!-- Cabeçalho da Fita -->
+                <div class="flex justify-between items-center border-b-2 border-dashed border-stone-400 pb-2 mb-3">
+                    <span class="label-font text-xs tracking-widest text-stone-600 uppercase font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-print text-stone-700"></i> AR INFORMÁTICA - FITA TÉRMICA
+                    </span>
+                    <button onclick="toggleHistory()" class="text-stone-500 hover:text-stone-900 text-sm p-1">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                
+                <!-- Lista de Registros -->
+                <div id="historyList" class="lcd-font text-2xl h-48 overflow-y-auto space-y-1.5 pr-2 text-right tracking-wider text-stone-900">
+                    <div class="text-stone-500 text-center text-sm my-8 label-font">REGISTRO VAZIO</div>
+                </div>
+
+                <div class="mt-3 pt-2 border-t-2 border-dashed border-stone-400 flex justify-between items-center">
+                    <button onclick="clearHistory()" class="text-xs label-font bg-stone-200 hover:bg-stone-300 text-stone-800 px-3 py-1 rounded border border-stone-400 transition">
+                        <i class="fa-solid fa-trash-can mr-1"></i> DESTACAR FITA
+                    </button>
+                    <span class="text-[10px] label-font text-stone-500">RTC-1984 VINTAGE</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Corpo Principal de Plástico Vintage -->
+        <div class="case-texture w-full rounded-3xl p-5 sm:p-6 border-2 border-stone-300/40 relative z-20">
+
+            <!-- TÍTULO DE EM DESTAQUE NO TOPO DA CALCULADORA: AR INFORMÁTICA -->
+            <div class="metallic-badge rounded-xl p-2.5 mb-4 text-center border shadow-sm flex flex-col items-center justify-center">
+                <span class="brand-font font-black tracking-widest text-stone-900 text-xl sm:text-2xl uppercase drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
+                    AR INFORMÁTICA
+                </span>
+                <div class="flex items-center gap-2 mt-0.5">
+                    <span class="h-[1px] w-8 bg-stone-600/40"></span>
+                    <span class="label-font text-[9px] text-stone-700 tracking-widest font-bold uppercase">ELECTRONIC CALCULATOR • MODEL AR-80</span>
+                    <span class="h-[1px] w-8 bg-stone-600/40"></span>
+                </div>
+            </div>
+
+            <!-- Cabeçalho Secundário: Grelha do Alto-Falante & LED -->
+            <div class="flex justify-between items-center mb-3 px-1">
+                <span class="label-font text-[10px] text-stone-600 font-bold uppercase tracking-wider">CMOS HIGH SPEED</span>
+
+                <!-- Grade do Alto-Falante Synthesizer & LED -->
+                <div class="flex items-center gap-3">
+                    <div class="flex gap-1">
+                        <div class="w-1 h-4 bg-stone-400/70 rounded-full shadow-inner"></div>
+                        <div class="w-1 h-4 bg-stone-400/70 rounded-full shadow-inner"></div>
+                        <div class="w-1 h-4 bg-stone-400/70 rounded-full shadow-inner"></div>
+                        <div class="w-1 h-4 bg-stone-400/70 rounded-full shadow-inner"></div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <div id="powerLed" class="led-indicator w-2.5 h-2.5 bg-green-500 rounded-full on transition-all duration-300"></div>
+                        <span class="text-[8px] font-bold text-stone-600 label-font">ON</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Moldura do Display LCD -->
+            <div class="lcd-container p-3 sm:p-4 rounded-xl mb-4 relative overflow-hidden">
+                <div class="lcd-screen rounded-lg p-3 sm:p-4 h-24 sm:h-28 flex flex-col justify-between relative overflow-hidden">
+                    <div class="glass-glare absolute inset-0 pointer-events-none z-10"></div>
+                    
+                    <!-- Linha Superior do LCD -->
+                    <div class="flex justify-between items-center text-xs sm:text-sm font-bold z-0 text-emerald-950/80 label-font">
+                        <div class="flex items-center gap-2">
+                            <span id="memIndicator" class="opacity-0 transition-opacity font-extrabold bg-emerald-900/15 px-1 rounded">M</span>
+                            <span id="soundIndicator" class="text-[10px] font-bold bg-emerald-900/15 px-1 rounded flex items-center gap-1">
+                                <i class="fa-solid fa-volume-high"></i> SND
+                            </span>
+                        </div>
+                        <div id="expressionDisplay" class="truncate max-w-[180px] text-right font-mono text-emerald-950/80"></div>
+                    </div>
+
+                    <!-- Linha Principal de Números -->
+                    <div class="text-right z-0">
+                        <span id="mainDisplay" class="lcd-font text-4xl sm:text-5xl font-bold tracking-wider text-emerald-950 leading-none block overflow-x-auto whitespace-nowrap no-scrollbar">
+                            0
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões de Controle Superior -->
+            <div class="grid grid-cols-4 gap-2 mb-3">
+                <button onclick="toggleAudio()" class="btn-retro btn-dark py-2 text-xs label-font" title="Som">
+                    <i id="soundIcon" class="fa-solid fa-volume-high mr-1"></i> AUD
+                </button>
+                <button onclick="toggleHistory()" class="btn-retro btn-dark py-2 text-xs label-font" title="Fita de Registro">
+                    <i class="fa-solid fa-receipt mr-1"></i> FITA
+                </button>
+                <button onclick="handleMemory('MC')" class="btn-retro btn-dark py-2 text-xs label-font">MC</button>
+                <button onclick="handleMemory('MR')" class="btn-retro btn-dark py-2 text-xs label-font">MR</button>
+            </div>
+
+            <!-- Teclado Principal -->
+            <div class="grid grid-cols-4 gap-2.5 sm:gap-3">
+                <!-- Linha 1: Memória e Raiz Quadrada -->
+                <button onclick="handleMemory('M-')" class="btn-retro btn-dark py-3 sm:py-3.5 text-sm sm:text-base">M-</button>
+                <button onclick="handleMemory('M+')" class="btn-retro btn-dark py-3 sm:py-3.5 text-sm sm:text-base">M+</button>
+                <button onclick="handleSqrt()" class="btn-retro btn-dark py-3 sm:py-3.5 text-sm sm:text-base">√</button>
+                <button onclick="handleOp('/')" class="btn-retro btn-orange py-3 sm:py-3.5 text-lg font-bold">÷</button>
+
+                <!-- Linha 2: 7, 8, 9, Multiplicação -->
+                <button onclick="inputDigit('7')" class="btn-retro btn-beige py-3 sm:py-3.5 text-xl sm:text-2xl">7</button>
+                <button onclick="inputDigit('8')" class="btn-retro btn-beige py-3 sm:py-3.5 text-xl sm:text-2xl">8</button>
+                <button onclick="inputDigit('9')" class="btn-retro btn-beige py-3 sm:py-3.5 text-xl sm:text-2xl">9</button>
+                <button onclick="handleOp('*')" class="btn-retro btn-orange py-3 sm:py-3.5 text-lg font-bold">×</button>
+
+                <!-- Linha 3: 4, 5, 6, Subtração -->
+                <button onclick="inputDigit('4')" class="btn-retro btn-beige py-3 sm:py-3.5 text-xl sm:text-2xl">4</button>
+                <button onclick="inputDigit('5')" class="btn-retro btn-beige py-3 sm:py-3.5 text-xl sm:text-2xl">5</button>
+                <button onclick="inputDigit('6')" class="btn-retro btn-beige py-3 sm:py-3.5 text-xl sm:text-2xl">6</button>
+                <button onclick="handleOp('-')" class="btn-retro btn-orange py-3 sm:py-3.5 text-lg font-bold">−</button>
+
+                <!-- Linha 4: 1, 2, 3, Adição -->
+                <button onclick="inputDigit('1')" class="btn-retro btn-beige py-3 sm:py-3.5 text-xl sm:text-2xl">1</button>
+                <button onclick="inputDigit('2')" class="btn-retro btn-beige py-3 sm:py-3.5 text-xl sm:text-2xl">2</button>
+                <button onclick="inputDigit('3')" class="btn-retro btn-beige py-3 sm:py-3.5 text-xl sm:text-2xl">3</button>
+                <button onclick="handleOp('+')" class="btn-retro btn-orange py-3 sm:py-3.5 text-lg font-bold">+</button>
+
+                <!-- Linha 5: Inversão, 0, Ponto, Porcentagem -->
+                <button onclick="toggleSign()" class="btn-retro btn-beige py-3 sm:py-3.5 text-sm sm:text-base">+/−</button>
+                <button onclick="inputDigit('0')" class="btn-retro btn-beige py-3 sm:py-3.5 text-xl sm:text-2xl">0</button>
+                <button onclick="inputDot()" class="btn-retro btn-beige py-3 sm:py-3.5 text-xl sm:text-2xl">.</button>
+                <button onclick="handleOp('%')" class="btn-retro btn-dark py-3 sm:py-3.5 text-sm sm:text-base">%</button>
+
+                <!-- Linha 6: Limpeza Parcial, Limpeza Total (AC/ON) e Igual -->
+                <button onclick="clearEntry()" class="btn-retro btn-red py-3 text-sm label-font font-bold">C</button>
+                <button onclick="clearAll()" class="btn-retro btn-yellow py-3 text-sm label-font font-bold">AC/ON</button>
+                <button onclick="calculate()" class="btn-retro btn-orange col-span-2 py-3 text-xl font-bold">=</button>
+            </div>
+
+            <!-- Rodapé da Calculadora -->
+            <div class="mt-4 flex justify-between items-center text-[9px] label-font text-stone-600 px-1 border-t border-stone-400/40 pt-2.5">
+                <span>SOLAR CELL BACKUP</span>
+                <span class="font-bold">AR INFORMÁTICA © 1984</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script com Funções de Raiz Quadrada e Ajustes de Teclado -->
+    <script>
+        /* State Variables */
+        let currentValue = '0';
+        let previousValue = null;
+        let operation = null;
+        let waitingForSecondOperand = false;
+        let memoryValue = 0;
+        let history = [];
+        let soundEnabled = true;
+
+        /* Web Audio API Context */
+        let audioCtx = null;
+
+        // Inicializar contexto de áudio com interação
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Sintetizador de som de clique físico retrô
+        function playRetroClick(type = 'normal') {
+            if (!soundEnabled) return;
+            initAudio();
+
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'normal') {
+                // Clique metálico/plástico rápido
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.exponentialRampToValueAtTime(40, now + 0.03);
+
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+
+                osc.start(now);
+                osc.stop(now + 0.03);
+            } else if (type === 'operator') {
+                // Tom um pouco mais agudo para operadores
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(240, now);
+                osc.frequency.exponentialRampToValueAtTime(80, now + 0.04);
+
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+
+                osc.start(now);
+                osc.stop(now + 0.04);
+            } else if (type === 'clear') {
+                // Som duplo rápido para limpar
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.exponentialRampToValueAtTime(60, now + 0.05);
+
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+
+                osc.start(now);
+                osc.stop(now + 0.05);
+            }
+        }
+
+        // Feedback de Vibração Hápter
+        function triggerHaptic() {
+            if (navigator.vibrate) {
+                navigator.vibrate(12);
+            }
+        }
+
+        // Registrar ações
+        function triggerFeedback(type = 'normal') {
+            playRetroClick(type);
+            triggerHaptic();
+        }
+
+        /* Lógica do Display */
+        const mainDisplay = document.getElementById('mainDisplay');
+        const expressionDisplay = document.getElementById('expressionDisplay');
+        const memIndicator = document.getElementById('memIndicator');
+
+        function updateDisplay() {
+            // Formatar número para não estourar a tela LCD
+            let formatted = currentValue;
+            if (formatted.length > 12) {
+                const num = parseFloat(formatted);
+                if (!isNaN(num)) {
+                    formatted = num.toPrecision(8).toString();
+                }
+            }
+            mainDisplay.textContent = formatted;
+
+            // Expressão superior
+            if (previousValue !== null && operation !== null) {
+                const opSymbol = operation === '*' ? '×' : operation === '/' ? '÷' : operation;
+                expressionDisplay.textContent = `${previousValue} ${opSymbol}`;
+            } else {
+                expressionDisplay.textContent = '';
+            }
+
+            // Indicador de memória
+            if (memoryValue !== 0) {
+                memIndicator.classList.remove('opacity-0');
+            } else {
+                memIndicator.classList.add('opacity-0');
+            }
+        }
+
+        /* Entrada de Dígitos */
+        function inputDigit(digit) {
+            triggerFeedback('normal');
+            if (waitingForSecondOperand) {
+                currentValue = digit;
+                waitingForSecondOperand = false;
+            } else {
+                currentValue = currentValue === '0' ? digit : currentValue + digit;
+            }
+            updateDisplay();
+        }
+
+        /* Entrada de Ponto Decimal */
+        function inputDot() {
+            triggerFeedback('normal');
+            if (waitingForSecondOperand) {
+                currentValue = '0.';
+                waitingForSecondOperand = false;
+                updateDisplay();
+                return;
+            }
+            if (!currentValue.includes('.')) {
+                currentValue += '.';
+            }
+            updateDisplay();
+        }
+
+        /* Inversão de Sinal (+/-) */
+        function toggleSign() {
+            triggerFeedback('normal');
+            currentValue = (parseFloat(currentValue) * -1).toString();
+            updateDisplay();
+        }
+
+        /* Manipulação de Operações */
+        function handleOp(nextOp) {
+            triggerFeedback('operator');
+            const inputValue = parseFloat(currentValue);
+
+            if (nextOp === '%' && previousValue !== null) {
+                // Porcentagem baseada no valor anterior
+                const percentVal = (previousValue * inputValue) / 100;
+                currentValue = percentVal.toString();
+                updateDisplay();
+                return;
+            } else if (nextOp === '%') {
+                currentValue = (inputValue / 100).toString();
+                updateDisplay();
+                return;
+            }
+
+            if (previousValue === null) {
+                previousValue = inputValue;
+            } else if (operation) {
+                const result = performCalculation(previousValue, inputValue, operation);
+                currentValue = String(result);
+                previousValue = result;
+            }
+
+            waitingForSecondOperand = true;
+            operation = nextOp;
+            updateDisplay();
+        }
+
+        /* Cálculo Principal */
+        function performCalculation(first, second, op) {
+            switch (op) {
+                case '+': return first + second;
+                case '-': return first - second;
+                case '*': return first * second;
+                case '/': return second !== 0 ? first / second : 'ERRO';
+                default: return second;
+            }
+        }
+
+        function calculate() {
+            triggerFeedback('operator');
+            if (operation === null || waitingForSecondOperand) return;
+
+            const inputValue = parseFloat(currentValue);
+            const result = performCalculation(previousValue, inputValue, operation);
+
+            const opSymbol = operation === '*' ? '×' : operation === '/' ? '÷' : operation;
+            const historyEntry = `${previousValue} ${opSymbol} ${inputValue} = ${result}`;
+            
+        // Função de Raiz Quadrada
+        function handleSqrt() {
+            triggerFeedback('operator');
+            const current = parseFloat(currentValue);
+            if (current < 0) {
+                currentValue = 'ERRO';
+            } else {
+                const result = Math.sqrt(current);
+                const historyEntry = `√(${current}) = ${result}`;
+                addHistory(historyEntry);
+                currentValue = String(result);
+            }
+            waitingForSecondOperand = true;
+            updateDisplay();
+        }
+
+        /* Suporte ao Teclado Físico Ampliado */
+        window.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') inputDigit(e.key);
+            if (e.key === '.' || e.key === ',') inputDot();
+            if (e.key === '+' || e.key === '-') handleOp(e.key);
+            if (e.key === '*') handleOp('*');
+            if (e.key === '/') handleOp('/');
+            if (e.key === '%') handleOp('%');
+            if (e.key === 'Enter' || e.key === '=') calculate();
+            if (e.key === 'Escape') clearAll();
+            if (e.key === 'Backspace') clearEntry();
+            if (e.key === 'r' || e.key === 'R') handleSqrt();
+        });
+
+        // Inicializar Display na Carga
+        window.onload = function() {
+            updateDisplay();
+        };
+    </script>
+</body>
+</html>
+```
